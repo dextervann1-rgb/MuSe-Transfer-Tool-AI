@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: MuSe Transfer Tool AI — Public Interface Shell
+  version: 0.1.0
+  description: |
+    Documentation-only API contract for a controlled repository-transfer workflow.
+    This public shell is not a deployed endpoint and does not include private configuration,
+    provider integrations, or credentials.
+paths:
+  /healthz:
+    get:
+      summary: Return a minimal liveness result
+      responses:
+        '200':
+          description: Service is reachable
+  /api/status:
+    get:
+      summary: Return a safe readiness summary
+      security:
+        - museApiKey: []
+      responses:
+        '200':
+          description: Non-secret status fields only
+  /api/clone:
+    post:
+      summary: Clone or update owner-configured repository mirrors
+      security:
+        - museApiKey: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strict_count:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Safe mirror-update summary
+        '400':
+          description: Configuration or validation gate failed
+  /api/scan-secrets:
+    post:
+      summary: Run a redacted secret scan against configured mirrors
+      security:
+        - museApiKey: []
+      responses:
+        '200':
+          description: Redacted finding summary
+  /api/certify:
+    post:
+      summary: Create certification evidence after a clean scan
+      security:
+        - museApiKey: []
+      responses:
+        '200':
+          description: Manifest and checksum summary
+        '400':
+          description: Certification gate failed
+  /api/ipfs:
+    post:
+      summary: Pin previously verified artifacts through an owner-authorized storage provider
+      security:
+        - museApiKey: []
+      responses:
+        '200':
+          description: Artifact-receipt summary
+        '400':
+          description: Evidence or runtime authorization prerequisite failed
+  /api/push-to-github:
+    post:
+      summary: Publish only to an owner-configured destination after explicit approval
+      security:
+        - museApiKey: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dry_run:
+                  type: boolean
+                  default: true
+                commit_message:
+                  type: string
+      responses:
+        '200':
+          description: Publishing result or non-destructive dry-run summary
+        '400':
+          description: Source hygiene, destination validation, or approval gate failed
+components:
+  securitySchemes:
+    museApiKey:
+      type: apiKey
+      in: header
+      name: X-MuSe-API-Key

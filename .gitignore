@@ -1,0 +1,16 @@
+# Never commit runtime credentials or local configuration
+.env
+.env.*
+!.env.example
+config/repositories.json
+
+# Never commit private collaboration records or generated operational artifacts
+private_artifacts/
+certified_backup/
+scan-reports/
+*.secret
+
+# Local tooling
+__pycache__/
+.pytest_cache/
+.DS_Store
